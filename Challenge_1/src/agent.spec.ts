@@ -8,7 +8,7 @@ import {
 } from "forta-agent";
 import agent, {
   ERC20_TRANSFER_EVENT,
-  TETHER_ADDRESS,
+  FORTA_BOTS_ADDRESS,
   TETHER_DECIMALS,
 } from "./agent";
 
@@ -30,7 +30,7 @@ describe("high tether transfer agent", () => {
       expect(mockTxEvent.filterLog).toHaveBeenCalledTimes(1);
       expect(mockTxEvent.filterLog).toHaveBeenCalledWith(
         ERC20_TRANSFER_EVENT,
-        TETHER_ADDRESS
+        FORTA_BOTS_ADDRESS
       );
     });
 
@@ -67,7 +67,7 @@ describe("high tether transfer agent", () => {
       expect(mockTxEvent.filterLog).toHaveBeenCalledTimes(1);
       expect(mockTxEvent.filterLog).toHaveBeenCalledWith(
         ERC20_TRANSFER_EVENT,
-        TETHER_ADDRESS
+        FORTA_BOTS_ADDRESS
       );
     });
   });
