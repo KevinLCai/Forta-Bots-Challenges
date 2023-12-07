@@ -6,28 +6,27 @@ import {
   TransactionEvent,
 } from "forta-agent";
 
-export const CREATE_AGENT_EVENT_ABI =
-  "function createAgent(uint256 agentId, address, string metadata, uint256[] chainIds) external";
+export const CREATE_AGENT_EVENT_ABI = "function createAgent(uint256 agentId, address, string metadata, uint256[] chainIds) external";
+export const REGISTRY_ADDRESS = "0x61447385B019187daa48e91c55c02AF1F1f3F863";
 export const FORTA_BOTS_ADDRESS = "0x88dc3a2284fa62e0027d6d6b1fcfdd2141a143b8";
+
 
 function provideHandleTransaction(
   eventABI: string,
+  registryAddress: string,
   fortaBotsAddress: string,
 ): HandleTransaction {
   return async function handleTransaction(txEvent: TransactionEvent) {
 
+    // console.log(txEvent);
+
     const findings: Finding[] = [];
 
-  // Filter Forta Bot transactions
+  // Filter Forta Bot transactions are coming from Registry
   const fortaDeploymentEvents = txEvent.filterFunction(
     eventABI,
-    fortaBotsAddress
+    registryAddress,
   );
-
-  // const fortaDeploymentEvents: TransactionEvent[] = [txEvent];
-
-  console.log("LOGS")
-  console.log(fortaDeploymentEvents)
 
   for (const transferEvent of fortaDeploymentEvents) {
     const address = txEvent.from
@@ -54,7 +53,6 @@ function provideHandleTransaction(
 }
 
 
-
 export default {
-  handleTransaction: provideHandleTransaction(CREATE_AGENT_EVENT_ABI, FORTA_BOTS_ADDRESS),
+  handleTransaction: provideHandleTransaction(CREATE_AGENT_EVENT_ABI, REGISTRY_ADDRESS, FORTA_BOTS_ADDRESS),
 };
