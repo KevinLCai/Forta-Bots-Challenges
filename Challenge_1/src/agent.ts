@@ -6,33 +6,39 @@ import {
   TransactionEvent,
 } from "forta-agent";
 
-export const CREATE_AGENT_EVENT_ABI = "function createAgent(uint256 agentId, address, string metadata, uint256[] chainIds) external";
+export const CREATE_AGENT_EVENT_ABI = "function createAgent(uint256 agentId,address ,string metadata,uint256[] chainIds)";
+export const UPDATE_AGENT_EVENT_ABI = "function updateAgent(uint256 agentId,string metadata,uint256[] chainIds) external";
 export const REGISTRY_ADDRESS = "0x61447385B019187daa48e91c55c02AF1F1f3F863";
 export const FORTA_BOTS_ADDRESS = "0x88dc3a2284fa62e0027d6d6b1fcfdd2141a143b8";
 
 
 function provideHandleTransaction(
-  eventABI: string,
+  createAgentEventABI: string,
+  updateAgentEventABI: string,
   registryAddress: string,
   fortaBotsAddress: string,
 ): HandleTransaction {
   return async function handleTransaction(txEvent: TransactionEvent) {
-
-    // console.log(txEvent);
+    console.log(txEvent)
 
     const findings: Finding[] = [];
 
   // Filter Forta Bot transactions are coming from Registry
-  const fortaDeploymentEvents = txEvent.filterFunction(
-    eventABI,
+  const createAgentEvents = txEvent.filterFunction(
+    createAgentEventABI,
     registryAddress,
   );
 
-  for (const transferEvent of fortaDeploymentEvents) {
-    const address = txEvent.from
+  const updateAgentEvents = txEvent.filterFunction(
+    updateAgentEventABI,
+    registryAddress,
+  );
+
+  for (const createAgentEvent of createAgentEvents) {
+    const createAgentEventAddress = txEvent.from
 
     // Compare with transferEvent.from instead of txEvent.from
-    if (address === fortaBotsAddress) {
+    if (createAgentEventAddress === fortaBotsAddress) {
       findings.push(
         Finding.fromObject({
           name: "Forta TX",
@@ -41,7 +47,27 @@ function provideHandleTransaction(
           severity: FindingSeverity.Low,
           type: FindingType.Info,
           metadata: {
-            address,
+            createAgentEventAddress,
+          },
+        })
+      );
+    }
+  }
+
+  for (const updateAgentEvent of updateAgentEventABI) {
+    const updateAgentEventAddress = txEvent.from
+
+    // Compare with transferEvent.from instead of txEvent.from
+    if (updateAgentEventAddress === fortaBotsAddress) {
+      findings.push(
+        Finding.fromObject({
+          name: "Forta TX",
+          description: "Forta contract tx",
+          alertId: "FORTA-1",
+          severity: FindingSeverity.Low,
+          type: FindingType.Info,
+          metadata: {
+            updateAgentEventAddress,
           },
         })
       );
@@ -54,5 +80,5 @@ function provideHandleTransaction(
 
 
 export default {
-  handleTransaction: provideHandleTransaction(CREATE_AGENT_EVENT_ABI, REGISTRY_ADDRESS, FORTA_BOTS_ADDRESS),
+  handleTransaction: provideHandleTransaction(CREATE_AGENT_EVENT_ABI, UPDATE_AGENT_EVENT_ABI, REGISTRY_ADDRESS, FORTA_BOTS_ADDRESS),
 };

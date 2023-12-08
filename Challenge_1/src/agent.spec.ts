@@ -5,70 +5,70 @@
 //   HandleTransaction,
 //   createTransactionEvent,
 //   ethers,
+//   TransactionEvent,
 // } from "forta-agent";
 // import agent, {
-//   ERC20_TRANSFER_EVENT,
+//   CREATE_AGENT_EVENT_ABI,
 //   FORTA_BOTS_ADDRESS,
-//   TETHER_DECIMALS,
+//   REGISTRY_ADDRESS,
 // } from "./agent";
+// import { TestTransactionEvent } from "forta-agent-tools/lib/test";
 
-// describe("high tether transfer agent", () => {
+// describe("Forta Bot Deployment Agent", () => {
 //   let handleTransaction: HandleTransaction;
-//   const mockTxEvent = createTransactionEvent({} as any);
 
 //   beforeAll(() => {
 //     handleTransaction = agent.handleTransaction;
 //   });
 
 //   describe("handleTransaction", () => {
-//     it("returns empty findings if there are no Tether transfers", async () => {
-//       mockTxEvent.filterLog = jest.fn().mockReturnValue([]);
-
+//     // let mockTxEvent: TransactionEvent = new TestTransactionEvent();
+//     it("returns empty findings if there are no bot deployments", async () => {
+//       let mockTxEvent: TransactionEvent = new TestTransactionEvent();
 //       const findings = await handleTransaction(mockTxEvent);
-
 //       expect(findings).toStrictEqual([]);
-//       expect(mockTxEvent.filterLog).toHaveBeenCalledTimes(1);
-//       expect(mockTxEvent.filterLog).toHaveBeenCalledWith(
-//         ERC20_TRANSFER_EVENT,
-//         FORTA_BOTS_ADDRESS
-//       );
 //     });
 
-//     it("returns a finding if there is a Tether transfer over 10,000", async () => {
-//       const mockTetherTransferEvent = {
-//         args: {
-//           from: "0xabc",
-//           to: "0xdef",
-//           value: ethers.BigNumber.from("20000000000"), //20k with 6 decimals
-//         },
-//       };
-//       mockTxEvent.filterLog = jest
-//         .fn()
-//         .mockReturnValue([mockTetherTransferEvent]);
-
+//     it("returns empty findings if the deployment address is wrong", async () => {
+//       let mockTxEvent: TransactionEvent = new TestTransactionEvent()
+//         .setFrom(FORTA_BOTS_ADDRESS)
+//         .setTo(REGISTRY_ADDRESS)
+//         .addTraces();
 //       const findings = await handleTransaction(mockTxEvent);
-
-//       const normalizedValue = mockTetherTransferEvent.args.value.div(
-//         10 ** TETHER_DECIMALS
-//       );
-//       expect(findings).toStrictEqual([
-//         Finding.fromObject({
-//           name: "High Tether Transfer",
-//           description: `High amount of USDT transferred: ${normalizedValue}`,
-//           alertId: "FORTA-1",
-//           severity: FindingSeverity.Low,
-//           type: FindingType.Info,
-//           metadata: {
-//             to: mockTetherTransferEvent.args.to,
-//             from: mockTetherTransferEvent.args.from,
-//           },
-//         }),
-//       ]);
-//       expect(mockTxEvent.filterLog).toHaveBeenCalledTimes(1);
-//       expect(mockTxEvent.filterLog).toHaveBeenCalledWith(
-//         ERC20_TRANSFER_EVENT,
-//         FORTA_BOTS_ADDRESS
-//       );
+//       expect(findings).toStrictEqual([]);
 //     });
+
+//     it("returns empty findings if the registry address is wrong", async () => {
+//       let mockTxEvent: TransactionEvent = new TestTransactionEvent()
+//         .setFrom(FORTA_BOTS_ADDRESS)
+//         .setTo(REGISTRY_ADDRESS)
+//         .addTraces();
+//       const findings = await handleTransaction(mockTxEvent);
+//       expect(findings).toStrictEqual([]);
+//     });
+
+//     it("returns empty findings if the function ABI is wrong", async () => {
+//         let mockTxEvent: TransactionEvent = new TestTransactionEvent()
+//           .setFrom(FORTA_BOTS_ADDRESS)
+//           .setTo(REGISTRY_ADDRESS)
+//           .addTraces();
+//         const findings = await handleTransaction(mockTxEvent);
+//         expect(findings).toStrictEqual([]);
+//       });
+
+//     it("returns all findings if there are multiple deployments", async () => {
+//         let mockTxEvent: TransactionEvent = new TestTransactionEvent()
+//           .setFrom(FORTA_BOTS_ADDRESS)
+//           .setTo(REGISTRY_ADDRESS)
+//           .addTraces();
+//         const findings = await handleTransaction(mockTxEvent);
+//         expect(findings).toStrictEqual([]);
+//       });
+
+//     // it("returns empty findings if there are no bot deployments", async () => {
+
+//     //     const findings = await handleTransaction(mockTxEvent);
+//     //     expect(findings).toStrictEqual([]);
+//     //   });
 //   });
 // });
