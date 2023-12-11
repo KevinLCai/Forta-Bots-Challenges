@@ -13,13 +13,14 @@ This agent detects bots that are created or deployed by Nethermind to the Forta 
 Describe each of the type of alerts fired by this agent
 
 - NETHERMIND-1
-  - Fired when Nethermind address creates a new Forta Bot 
+
+  - Fired when Nethermind address creates a new Forta Bot
   - Severity is always set to "low"
   - Type is always set to "info"
   - Metadata: Nethermind Deployment Address
 
 - NETHERMIND-2
-  - Fired when Nethermind address updates a Forta Bot 
+  - Fired when Nethermind address updates a Forta Bot
   - Severity is always set to "low"
   - Type is always set to "info"
   - Metadata: Nethermind Deployment Address

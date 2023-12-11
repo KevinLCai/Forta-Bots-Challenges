@@ -24,7 +24,12 @@ describe("Forta Bot Deployment Agent", () => {
     handleTransaction = agent.handleTransaction;
   });
 
-  const mockCreateAgentEventData = [1, createAddress("0x01"), "Mock tx 1", [137]];
+  const mockCreateAgentEventData = [
+    1,
+    createAddress("0x01"),
+    "Mock tx 1",
+    [137],
+  ];
   const mockUpdateAgentEventData = [1, "Mock tx 2", [137]];
 
   const WRONG_FUNCTION_ABI =
