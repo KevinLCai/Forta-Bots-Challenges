@@ -51,9 +51,9 @@ describe("Forta Bot Deployment Agent", () => {
 
       expect(findings).toStrictEqual([
         expect.objectContaining({
-          name: "Forta TX",
-          description: "Forta contract tx",
-          alertId: "FORTA-1",
+          name: "Agent Created",
+          description: "NM Agent Created",
+          alertId: "NETHERMIND-1",
           protocol: "ethereum",
           severity: FindingSeverity.Low,
           type: FindingType.Info,
@@ -89,9 +89,9 @@ describe("Forta Bot Deployment Agent", () => {
 
       expect(findings).toStrictEqual([
         expect.objectContaining({
-          name: "Forta TX",
-          description: "Forta contract tx",
-          alertId: "FORTA-1",
+          name: "Agent Created",
+          description: "NM Agent Created",
+          alertId: "NETHERMIND-1",
           protocol: "ethereum",
           severity: FindingSeverity.Low,
           type: FindingType.Info,
@@ -104,9 +104,9 @@ describe("Forta Bot Deployment Agent", () => {
           source: {},
         }),
         expect.objectContaining({
-          name: "Forta TX",
-          description: "Forta contract tx",
-          alertId: "FORTA-1",
+          name: "Agent Created",
+          description: "NM Agent Created",
+          alertId: "NETHERMIND-1",
           protocol: "ethereum",
           severity: FindingSeverity.Low,
           type: FindingType.Info,
@@ -142,9 +142,9 @@ describe("Forta Bot Deployment Agent", () => {
 
       expect(findings).toStrictEqual([
         expect.objectContaining({
-          name: "Forta TX",
-          description: "Forta contract tx",
-          alertId: "FORTA-1",
+          name: "Agent Created",
+          description: "NM Agent Created",
+          alertId: "NETHERMIND-1",
           protocol: "ethereum",
           severity: FindingSeverity.Low,
           type: FindingType.Info,
@@ -157,9 +157,9 @@ describe("Forta Bot Deployment Agent", () => {
           source: {},
         }),
         expect.objectContaining({
-          name: "Forta TX",
-          description: "Forta contract tx",
-          alertId: "FORTA-1",
+          name: "Agent Update",
+          description: "NM Agent Updated",
+          alertId: "NETHERMIND-2",
           protocol: "ethereum",
           severity: FindingSeverity.Low,
           type: FindingType.Info,

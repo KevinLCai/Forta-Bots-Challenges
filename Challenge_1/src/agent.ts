@@ -40,9 +40,9 @@ function provideHandleTransaction(
     if (createAgentEventAddress === fortaBotsAddress) {
       findings.push(
         Finding.fromObject({
-          name: "Forta TX",
-          description: "Forta contract tx",
-          alertId: "FORTA-1",
+          name: "Agent Created",
+          description: "NM Agent Created",
+          alertId: "NETHERMIND-1",
           severity: FindingSeverity.Low,
           type: FindingType.Info,
           metadata: {
@@ -60,9 +60,9 @@ function provideHandleTransaction(
     if (updateAgentEventAddress === fortaBotsAddress) {
       findings.push(
         Finding.fromObject({
-          name: "Forta TX",
-          description: "Forta contract tx",
-          alertId: "FORTA-1",
+          name: "Agent Update",
+          description: "NM Agent Updated",
+          alertId: "NETHERMIND-2",
           severity: FindingSeverity.Low,
           type: FindingType.Info,
           metadata: {
