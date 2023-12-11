@@ -24,8 +24,8 @@ describe("Forta Bot Deployment Agent", () => {
     handleTransaction = agent.handleTransaction;
   });
 
-  const mockTxEventData1 = [1, createAddress("0x01"), "Mock tx 1", [137]];
-  const mockTxEventData2 = [1, createAddress("0x02"), "Mock tx 2", [137]];
+  const mockCreateAgentEventData = [1, createAddress("0x01"), "Mock tx 1", [137]];
+  const mockUpdateAgentEventData = [1, "Mock tx 2", [137]];
 
   const WRONG_FUNCTION_ABI =
     "function wrongFunction(uint256 agentId,address ,string metadata,uint256[] chainIds)";
@@ -44,7 +44,7 @@ describe("Forta Bot Deployment Agent", () => {
           function: createAgentInterface.getFunction("createAgent"),
           to: REGISTRY_ADDRESS,
           from: FORTA_BOTS_ADDRESS,
-          arguments: mockTxEventData1,
+          arguments: mockCreateAgentEventData,
         });
 
       const findings = await handleTransaction(mockTxEvent);
@@ -76,13 +76,13 @@ describe("Forta Bot Deployment Agent", () => {
           function: createAgentInterface.getFunction("createAgent"),
           to: REGISTRY_ADDRESS,
           from: FORTA_BOTS_ADDRESS,
-          arguments: mockTxEventData1,
+          arguments: mockCreateAgentEventData,
         })
         .addTraces({
           function: createAgentInterface.getFunction("createAgent"),
           to: REGISTRY_ADDRESS,
           from: FORTA_BOTS_ADDRESS,
-          arguments: mockTxEventData1,
+          arguments: mockCreateAgentEventData,
         });
 
       const findings = await handleTransaction(mockTxEvent);
@@ -129,13 +129,13 @@ describe("Forta Bot Deployment Agent", () => {
           function: updateAgentInterface.getFunction("updateAgent"),
           to: REGISTRY_ADDRESS,
           from: FORTA_BOTS_ADDRESS,
-          arguments: mockTxEventData2,
+          arguments: mockUpdateAgentEventData,
         })
         .addTraces({
           function: createAgentInterface.getFunction("createAgent"),
           to: REGISTRY_ADDRESS,
           from: FORTA_BOTS_ADDRESS,
-          arguments: mockTxEventData1,
+          arguments: mockCreateAgentEventData,
         });
 
       const findings = await handleTransaction(mockTxEvent);
@@ -182,7 +182,7 @@ describe("Forta Bot Deployment Agent", () => {
           function: createAgentInterface.getFunction("createAgent"),
           to: REGISTRY_ADDRESS,
           from: wrongAddress,
-          arguments: mockTxEventData1,
+          arguments: mockCreateAgentEventData,
         });
 
       const findings = await handleTransaction(mockTxEvent);
@@ -197,7 +197,7 @@ describe("Forta Bot Deployment Agent", () => {
           function: createAgentInterface.getFunction("createAgent"),
           to: wrongAddress,
           from: FORTA_BOTS_ADDRESS,
-          arguments: mockTxEventData1,
+          arguments: mockCreateAgentEventData,
         });
 
       const findings = await handleTransaction(mockTxEvent);
@@ -212,7 +212,7 @@ describe("Forta Bot Deployment Agent", () => {
           function: wrongFunctionInterface.getFunction("wrongFunction"),
           to: REGISTRY_ADDRESS,
           from: FORTA_BOTS_ADDRESS,
-          arguments: mockTxEventData1,
+          arguments: mockCreateAgentEventData,
         });
 
       const findings = await handleTransaction(mockTxEvent);
