@@ -19,7 +19,6 @@ function provideHandleTransaction(
   fortaBotsAddress: string,
 ): HandleTransaction {
   return async function handleTransaction(txEvent: TransactionEvent) {
-    console.log(txEvent)
 
     const findings: Finding[] = [];
 
@@ -54,7 +53,7 @@ function provideHandleTransaction(
     }
   }
 
-  for (const updateAgentEvent of updateAgentEventABI) {
+  for (const updateAgentEvent of updateAgentEvents) {
     const updateAgentEventAddress = txEvent.from
 
     // Compare with transferEvent.from instead of txEvent.from
