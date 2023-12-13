@@ -1,10 +1,10 @@
 {
-  "name": "forta-agent-starter",
-  "displayName": "Forta Agent Starter",
+  "name": "nethermind-deployment-bot",
+  "displayName": "Nethermind Deployment Bot",
   "version": "0.0.1",
-  "description": "Forta Agent Typescript starter project",
-  "longDescription": "Welcome to the Forta Agent JavaScript starter project!\n\nForta Network presents this starter project as an entry point for bot developers who want to integrate with the Forta Network ecosystem. As part of our commitment to empowering developers, this project provides a foundation for building powerful and secure bots that can interact with the Forta platform and take advantage of its cutting-edge capabilities.\n\nThe Forta Agent SDK and CLI tool offer a seamless experience for developers who wish to leverage the decentralized and trustless environment provided by the Forta Network. Whether you're interested in creating DeFi bots, monitoring smart contract transactions, or generating real-time alerts, this starter project sets you on the right path to achieve your goals.\n\nJoin the Forta Network community and learn more about our mission to revolutionize decentralized finance and blockchain analytics: https://forta.org/",
-  "repository": "https://github.com/forta-network/forta-bot-sdk/tree/master/starter-project",
+  "description": "Forta Bot that detects bot deployments from Nethermind address",
+  "longDescription": "The bot identifies new agents and updated agents deployed from Nethermind to the bot deployment registry.",
+  "repository": "https://github.com/KevinLCai/Forta-Bots-Challenges",
   "licenseUrl": "https://github.com/forta-network/forta-bot-sdk/blob/master/starter-project/LICENSE.md",
   "promoUrl": "https://forta.org",
   "chainIds": [
@@ -29,7 +29,8 @@
     "enable": "forta-agent enable",
     "keyfile": "forta-agent keyfile",
     "stake": "forta-agent stake",
-    "test": "jest"
+    "test": "jest",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
     "forta-agent": "^0.1.45",
@@ -40,6 +41,7 @@
     "@types/nodemon": "^1.19.0",
     "jest": "^27.0.6",
     "nodemon": "^2.0.8",
+    "prettier": "^3.1.1",
     "ts-jest": "^27.0.3",
     "typescript": "^4.3.4"
   }

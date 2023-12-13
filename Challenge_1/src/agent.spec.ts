@@ -4,22 +4,13 @@ import {
   HandleTransaction,
   TransactionEvent,
 } from "forta-agent";
-import agent, {
-  CREATE_AGENT_EVENT_ABI,
-  UPDATE_AGENT_EVENT_ABI,
-  FORTA_BOTS_ADDRESS,
-  REGISTRY_ADDRESS,
-} from "./agent";
 import { TestTransactionEvent } from "forta-agent-tools/lib/test";
 import { createAddress } from "forta-agent-tools";
 import { Interface } from "@ethersproject/abi";
+import { provideHandleTransaction } from "./agent";
 
 describe("Forta Bot Deployment Agent", () => {
   let handleTransaction: HandleTransaction;
-
-  beforeAll(() => {
-    handleTransaction = agent.handleTransaction;
-  });
 
   const mockCreateAgentEventData = [
     1,
@@ -27,25 +18,51 @@ describe("Forta Bot Deployment Agent", () => {
     "Mock tx 1",
     [137],
   ];
+  const mockCreateAgentEventData2 = [
+    1,
+    createAddress("0x02"),
+    "Mock tx 2",
+    [137],
+  ];
   const mockUpdateAgentEventData = [1, "Mock tx 2", [137]];
 
+  const MOCK_BOT_REGISTRY_ADDRESS =
+    "0x61447385B019187daa48e91c55c02AF1F1f3F863";
+  const MOCK_NETHERMIND_DEPLOYER_ADDRESS =
+    "0x88dc3a2284fa62e0027d6d6b1fcfdd2141a143b8";
+
+  const MOCK_CREATE_AGENT_EVENT_ABI =
+    "function createAgent(uint256 agentId,address ,string metadata,uint256[] chainIds)";
+  const MOCK_UPDATE_AGENT_EVENT_ABI =
+    "function updateAgent(uint256 agentId,string metadata,uint256[] chainIds)";
   const WRONG_FUNCTION_ABI =
     "function wrongFunction(uint256 agentId,address ,string metadata,uint256[] chainIds)";
 
+  beforeAll(() => {
+    handleTransaction = provideHandleTransaction(
+      MOCK_CREATE_AGENT_EVENT_ABI,
+      MOCK_UPDATE_AGENT_EVENT_ABI,
+      MOCK_BOT_REGISTRY_ADDRESS,
+      MOCK_NETHERMIND_DEPLOYER_ADDRESS
+    );
+  });
+
   describe("handleTransaction", () => {
-    const createAgentInterface = new Interface([CREATE_AGENT_EVENT_ABI]);
-    const updateAgentInterface = new Interface([UPDATE_AGENT_EVENT_ABI]);
-    const wrongFunctionInterface = new Interface([WRONG_FUNCTION_ABI]);
+    const provideInterface = new Interface([
+      MOCK_CREATE_AGENT_EVENT_ABI,
+      MOCK_UPDATE_AGENT_EVENT_ABI,
+      WRONG_FUNCTION_ABI,
+    ]);
     const wrongAddress = createAddress("0x00");
 
     it("returns finding if there is one bot deployment", async () => {
       let mockTxEvent: TransactionEvent = new TestTransactionEvent()
-        .setTo(REGISTRY_ADDRESS)
-        .setFrom(FORTA_BOTS_ADDRESS)
+        .setTo(MOCK_BOT_REGISTRY_ADDRESS)
+        .setFrom(MOCK_NETHERMIND_DEPLOYER_ADDRESS)
         .addTraces({
-          function: createAgentInterface.getFunction("createAgent"),
-          to: REGISTRY_ADDRESS,
-          from: FORTA_BOTS_ADDRESS,
+          function: provideInterface.getFunction("createAgent"),
+          to: MOCK_BOT_REGISTRY_ADDRESS,
+          from: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           arguments: mockCreateAgentEventData,
         });
 
@@ -60,7 +77,7 @@ describe("Forta Bot Deployment Agent", () => {
           severity: FindingSeverity.Low,
           type: FindingType.Info,
           metadata: {
-            createAgentEventAddress: FORTA_BOTS_ADDRESS,
+            createAgentEventAddress: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           },
           addresses: [],
           labels: [],
@@ -72,22 +89,25 @@ describe("Forta Bot Deployment Agent", () => {
 
     it("returns findings if there are multiple bot deployments", async () => {
       let mockTxEvent: TransactionEvent = new TestTransactionEvent()
-        .setTo(REGISTRY_ADDRESS)
-        .setFrom(FORTA_BOTS_ADDRESS)
+        .setTo(MOCK_BOT_REGISTRY_ADDRESS)
+        .setFrom(MOCK_NETHERMIND_DEPLOYER_ADDRESS)
         .addTraces({
-          function: createAgentInterface.getFunction("createAgent"),
-          to: REGISTRY_ADDRESS,
-          from: FORTA_BOTS_ADDRESS,
+          function: provideInterface.getFunction("createAgent"),
+          to: MOCK_BOT_REGISTRY_ADDRESS,
+          from: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           arguments: mockCreateAgentEventData,
         })
         .addTraces({
-          function: createAgentInterface.getFunction("createAgent"),
-          to: REGISTRY_ADDRESS,
-          from: FORTA_BOTS_ADDRESS,
-          arguments: mockCreateAgentEventData,
+          function: provideInterface.getFunction("createAgent"),
+          to: MOCK_BOT_REGISTRY_ADDRESS,
+          from: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
+          arguments: mockCreateAgentEventData2,
         });
 
       const findings = await handleTransaction(mockTxEvent);
+
+      console.log("FINDINGS=========");
+      console.log(findings);
 
       expect(findings).toStrictEqual([
         expect.objectContaining({
@@ -98,7 +118,7 @@ describe("Forta Bot Deployment Agent", () => {
           severity: FindingSeverity.Low,
           type: FindingType.Info,
           metadata: {
-            createAgentEventAddress: FORTA_BOTS_ADDRESS,
+            createAgentEventAddress: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           },
           addresses: [],
           labels: [],
@@ -113,7 +133,7 @@ describe("Forta Bot Deployment Agent", () => {
           severity: FindingSeverity.Low,
           type: FindingType.Info,
           metadata: {
-            createAgentEventAddress: FORTA_BOTS_ADDRESS,
+            createAgentEventAddress: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           },
           addresses: [],
           labels: [],
@@ -125,18 +145,18 @@ describe("Forta Bot Deployment Agent", () => {
 
     it("returns multiple findings for different function calls", async () => {
       let mockTxEvent: TransactionEvent = new TestTransactionEvent()
-        .setTo(REGISTRY_ADDRESS)
-        .setFrom(FORTA_BOTS_ADDRESS)
+        .setTo(MOCK_BOT_REGISTRY_ADDRESS)
+        .setFrom(MOCK_NETHERMIND_DEPLOYER_ADDRESS)
         .addTraces({
-          function: updateAgentInterface.getFunction("updateAgent"),
-          to: REGISTRY_ADDRESS,
-          from: FORTA_BOTS_ADDRESS,
+          function: provideInterface.getFunction("updateAgent"),
+          to: MOCK_BOT_REGISTRY_ADDRESS,
+          from: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           arguments: mockUpdateAgentEventData,
         })
         .addTraces({
-          function: createAgentInterface.getFunction("createAgent"),
-          to: REGISTRY_ADDRESS,
-          from: FORTA_BOTS_ADDRESS,
+          function: provideInterface.getFunction("createAgent"),
+          to: MOCK_BOT_REGISTRY_ADDRESS,
+          from: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           arguments: mockCreateAgentEventData,
         });
 
@@ -151,7 +171,7 @@ describe("Forta Bot Deployment Agent", () => {
           severity: FindingSeverity.Low,
           type: FindingType.Info,
           metadata: {
-            createAgentEventAddress: FORTA_BOTS_ADDRESS,
+            createAgentEventAddress: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           },
           addresses: [],
           labels: [],
@@ -166,7 +186,7 @@ describe("Forta Bot Deployment Agent", () => {
           severity: FindingSeverity.Low,
           type: FindingType.Info,
           metadata: {
-            updateAgentEventAddress: FORTA_BOTS_ADDRESS,
+            updateAgentEventAddress: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           },
           addresses: [],
           labels: [],
@@ -178,11 +198,11 @@ describe("Forta Bot Deployment Agent", () => {
 
     it("returns empty findings if the deployment address is wrong", async () => {
       let mockTxEvent: TransactionEvent = new TestTransactionEvent()
-        .setTo(REGISTRY_ADDRESS)
+        .setTo(MOCK_BOT_REGISTRY_ADDRESS)
         .setFrom(wrongAddress)
         .addTraces({
-          function: createAgentInterface.getFunction("createAgent"),
-          to: REGISTRY_ADDRESS,
+          function: provideInterface.getFunction("createAgent"),
+          to: MOCK_BOT_REGISTRY_ADDRESS,
           from: wrongAddress,
           arguments: mockCreateAgentEventData,
         });
@@ -194,11 +214,11 @@ describe("Forta Bot Deployment Agent", () => {
     it("returns empty findings if the registry address is wrong", async () => {
       let mockTxEvent: TransactionEvent = new TestTransactionEvent()
         .setTo(wrongAddress)
-        .setFrom(FORTA_BOTS_ADDRESS)
+        .setFrom(MOCK_NETHERMIND_DEPLOYER_ADDRESS)
         .addTraces({
-          function: createAgentInterface.getFunction("createAgent"),
+          function: provideInterface.getFunction("createAgent"),
           to: wrongAddress,
-          from: FORTA_BOTS_ADDRESS,
+          from: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           arguments: mockCreateAgentEventData,
         });
 
@@ -208,12 +228,12 @@ describe("Forta Bot Deployment Agent", () => {
 
     it("returns empty findings if the function ABI is wrong", async () => {
       let mockTxEvent: TransactionEvent = new TestTransactionEvent()
-        .setTo(REGISTRY_ADDRESS)
-        .setFrom(FORTA_BOTS_ADDRESS)
+        .setTo(MOCK_BOT_REGISTRY_ADDRESS)
+        .setFrom(MOCK_NETHERMIND_DEPLOYER_ADDRESS)
         .addTraces({
-          function: wrongFunctionInterface.getFunction("wrongFunction"),
-          to: REGISTRY_ADDRESS,
-          from: FORTA_BOTS_ADDRESS,
+          function: provideInterface.getFunction("wrongFunction"),
+          to: MOCK_BOT_REGISTRY_ADDRESS,
+          from: MOCK_NETHERMIND_DEPLOYER_ADDRESS,
           arguments: mockCreateAgentEventData,
         });
 
