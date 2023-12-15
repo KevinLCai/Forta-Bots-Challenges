@@ -1,4 +1,4 @@
-# Detect Newly Created or Updated Agents Deployed to the Network by Nethermind
+# Nethermind Deployment/Update Monitor Bot
 
 ## Description
 
