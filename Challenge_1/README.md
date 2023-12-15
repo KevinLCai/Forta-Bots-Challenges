@@ -2,7 +2,7 @@
 
 ## Description
 
-This agent detects bots that are created or deployed by Nethermind to the Forta Bot Registry.
+This agent detects bots that are created or updated by Nethermind to the Forta Bot Registry.
 
 ## Supported Chains
 
@@ -16,7 +16,7 @@ This agent detects bots that are created or deployed by Nethermind to the Forta 
   - Severity is always set to "low"
   - Type is always set to "info"
   - Metadata includes: 
-    - createAgentEventAddress: Nethermind Deployment Address
+    - `createAgentEventAddress`: Nethermind Deployment Address
 
 - NETHERMIND-2
   - Fired when Nethermind address updates a Forta Bot
