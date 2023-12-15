@@ -23,7 +23,7 @@ This agent detects bots that are created or updated by Nethermind to the Forta B
   - Severity is always set to "low"
   - Type is always set to "info"
   - Metadata includes: 
-    - updateAgentEventAddress: Nethermind Deployment Address
+    - `updateAgentEventAddress`: Nethermind Deployment Address
 
 ## Test Data
 
