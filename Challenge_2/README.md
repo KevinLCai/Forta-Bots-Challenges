@@ -1,4 +1,4 @@
-# Large Tether Transfer Agent
+# Uniswap Swap Detection Bot
 
 ## Description
 
@@ -23,4 +23,4 @@ Describe each of the type of alerts fired by this agent
 
 The agent behaviour can be verified with the following transactions:
 
-- 0x3a0f757030beec55c22cbc545dd8a844cbbb2e6019461769e1bc3f3a95d10826 (15,000 USDT)
+- 0x621e80518c1ad2dde3321334c9aa1abe346ca4af9366671b33ddb36f0750b4fc

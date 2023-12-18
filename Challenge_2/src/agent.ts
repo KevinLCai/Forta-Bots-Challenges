@@ -1,92 +1,71 @@
 import {
-  BlockEvent,
   Finding,
-  Initialize,
-  HandleBlock,
-  HealthCheck,
   HandleTransaction,
-  HandleAlert,
-  AlertEvent,
   TransactionEvent,
   FindingSeverity,
   FindingType,
+  getEthersProvider,
 } from "forta-agent";
+import { ethers } from "ethers";
+import {
+  FACTORY_ADDRESS,
+  SWAP_EVENT_ABI,
+  UNISWAP_V3_FACTORY_ABI,
+  UNISWAP_TOKEN_POOL_ABI,
+} from "./constants";
+import { poolExists } from "./utils";
 
-export const ERC20_TRANSFER_EVENT =
-  "event Transfer(address indexed from, address indexed to, uint256 value)";
-export const TETHER_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
-export const TETHER_DECIMALS = 6;
-let findingsCount = 0;
+export function provideHandleTransaction(
+  factoryAddress: string,
+  swapEventABI: string,
+  factoryABI: string[],
+  tokenPoolABI: string[],
+  provider: ethers.providers.Provider
+): HandleTransaction {
+  return async function handleTransaction(txEvent: TransactionEvent) {
+    const findings: Finding[] = [];
 
-const handleTransaction: HandleTransaction = async (
-  txEvent: TransactionEvent
-) => {
-  const findings: Finding[] = [];
+    const v3SwapEvents = txEvent.filterLog(swapEventABI);
 
-  // limiting this agent to emit only 5 findings so that the alert feed is not spammed
-  if (findingsCount >= 5) return findings;
+    for (const v3SwapEvent of v3SwapEvents) {
+      const uniswapPoolAddress = v3SwapEvent.address;
+      const { sender, recipient, amount0, amount1, liquidity } =
+        v3SwapEvent.args;
 
-  // filter the transaction logs for Tether transfer events
-  const tetherTransferEvents = txEvent.filterLog(
-    ERC20_TRANSFER_EVENT,
-    TETHER_ADDRESS
-  );
-
-  tetherTransferEvents.forEach((transferEvent) => {
-    // extract transfer event arguments
-    const { to, from, value } = transferEvent.args;
-    // shift decimals of transfer value
-    const normalizedValue = value.div(10 ** TETHER_DECIMALS);
-
-    // if more than 10,000 Tether were transferred, report it
-    if (normalizedValue.gt(10000)) {
-      findings.push(
-        Finding.fromObject({
-          name: "High Tether Transfer",
-          description: `High amount of USDT transferred: ${normalizedValue}`,
-          alertId: "FORTA-1",
-          severity: FindingSeverity.Low,
-          type: FindingType.Info,
-          metadata: {
-            to,
-            from,
-          },
-        })
+      const uniswapPoolExists = await poolExists(
+        factoryAddress,
+        factoryABI,
+        tokenPoolABI,
+        uniswapPoolAddress,
+        provider
       );
-      findingsCount++;
+
+      if (uniswapPoolExists) {
+        findings.push(
+          Finding.fromObject({
+            name: "Uniswap Swap",
+            description: `Uniswap Swap Detected`,
+            alertId: "NETHERMIND-1",
+            severity: FindingSeverity.Low,
+            type: FindingType.Info,
+            metadata: {
+              recipient,
+              sender,
+            },
+          })
+        );
+      }
     }
-  });
-
-  return findings;
-};
-
-// const initialize: Initialize = async () => {
-//   // do some initialization on startup e.g. fetch data
-// }
-
-// const handleBlock: HandleBlock = async (blockEvent: BlockEvent) => {
-//   const findings: Finding[] = [];
-//   // detect some block condition
-//   return findings;
-// }
-
-// const handleAlert: HandleAlert = async (alertEvent: AlertEvent) => {
-//   const findings: Finding[] = [];
-//   // detect some alert condition
-//   return findings;
-// }
-
-// const healthCheck: HealthCheck = async () => {
-//   const errors: string[] = [];
-  // detect some health check condition
-  // errors.push("not healthy due to some condition")
-  // return errors;
-// }
+    return findings;
+  };
+}
 
 export default {
-  // initialize,
-  handleTransaction,
-  // healthCheck,
-  // handleBlock,
-  // handleAlert
+  handleTransaction: provideHandleTransaction(
+    FACTORY_ADDRESS,
+    SWAP_EVENT_ABI,
+    UNISWAP_V3_FACTORY_ABI,
+    UNISWAP_TOKEN_POOL_ABI,
+    getEthersProvider()
+  ),
 };
